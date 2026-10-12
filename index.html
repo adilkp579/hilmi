@@ -330,40 +330,17 @@ var DEMO=false;
 <script>
 /* Wishes: Supabase (free) if configured, otherwise browser-only demo storage */
 (function(){
-  var CONFIG={SUPABASE_URL:'',SUPABASE_KEY:'',TABLE:'wishes',MAX:500,VIDEO_URL:'video.mp4'};
+  var CONFIG={SUPABASE_URL:'https://xukscftcmrldkoqozewv.supabase.co',SUPABASE_KEY:'sb_publishable_aDlsEuzG_mHHkXaAEngMBg_YLSKslEW',TABLE:'wishes',MAX:500,VIDEO_URL:'video.mp4'};
   var live=!DEMO&&!!(CONFIG.SUPABASE_URL&&CONFIG.SUPABASE_KEY);
   var KEY=DEMO?'wishes_demo_test':'wishes_demo';
   var $=function(i){return document.getElementById(i);};
   var ov=$('ov'),photo=null;
 
   function api(path,opt){
-    opt=opt||{};opt.headers=Object.assign({apikey:CONFIG.SUPABASE_KEY,Authorization:'Bearer '+CONFIG.SUPABASE_KEY,'Content-Type':'application/json'},opt.headers||{});
+    opt=opt||{};opt.headers=Object.assign({apikey:CONFIG.SUPABASE_KEY,'Content-Type':'application/json'},/^eyJ/.test(CONFIG.SUPABASE_KEY)?{Authorization:'Bearer '+CONFIG.SUPABASE_KEY}:{},opt.headers||{});
     return fetch(CONFIG.SUPABASE_URL+'/rest/v1/'+path,opt).then(function(r){if(!r.ok)throw new Error('api');return r;});
   }
-  function mkPhoto(letter,hue){
-    var c=document.createElement('canvas');c.width=360;c.height=480;var x=c.getContext('2d');
-    var g=x.createLinearGradient(0,0,360,480);g.addColorStop(0,'hsl('+hue+',55%,62%)');g.addColorStop(1,'hsl('+((hue+40)%360)+',60%,28%)');
-    x.fillStyle=g;x.fillRect(0,0,360,480);
-    x.fillStyle='rgba(255,255,255,.28)';x.beginPath();x.arc(180,190,80,0,7);x.fill();
-    x.beginPath();x.ellipse(180,430,150,130,0,0,7);x.fill();
-    x.fillStyle='rgba(255,255,255,.9)';x.font='700 110px sans-serif';x.textAlign='center';x.fillText(letter,180,225);
-    return c.toDataURL('image/jpeg',.7);
-  }
-  function demoList(){
-    var d=[
-      ['Fathima','Friend','Happy Birthday Hilmi!','Wishing you the happiest birthday ever. Stay the lovely person you are, and may this year bring you everything your heart wants.',1,330],
-      ['Arun','Classmate','Many many happy returns','Another year, another reason to celebrate you. Keep smiling always!',0],
-      ['Raji Aunty','Neighbour','Allah bless you, mole','Wishing you a long, healthy and happy life. Come visit us soon, there is payasam waiting for you.',1,20],
-      ['Sana','Friend','To my bestie','You make every ordinary day feel special. I am so lucky to have you. Let us make this year full of trips, food and endless laughs. Love you loads! Do not forget my treat. We will celebrate properly very soon, I promise.',1,190],
-      ['Basheer','Family','Happy Birthday!','May Allah grant you all the happiness and success. Proud of you always.',0],
-      ['Anu','Colleague','Wishing you a fantastic year','Have a wonderful day full of cake, smiles and surprises.',1,270],
-      ['Nihal','Friend','Birthday Girl Alert!','Party time! Hope your day is as awesome as you are.',0],
-      ['Shifa','Well-wisher','May all your dreams come true','Sending you lots of love and the warmest wishes on your special day. Keep shining!',1,140],
-      ['Rahul','Classmate','Cheers to you','Wishing you a year filled with success, joy and good health. Enjoy your day to the fullest!',0],
-      ['Ammu','Family','The sweetest wish for a sweet soul on her birthday','Happy birthday my dear! You bring so much joy to everyone around you. May this year be your best one yet.',1,50]
-    ];
-    return d.map(function(r){return {name:r[0],relation:r[1],title:r[2],message:r[3],photo:r[4]?mkPhoto(r[0].charAt(0),r[5]):null};});
-  }
+  function demoList(){return [];}
   if(DEMO){var b=document.createElement('div');b.textContent='DEMO MODE · 1 min countdown';b.style.cssText='position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:200;background:#c71d27;color:#fff;font:600 11px/1 Outfit,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;padding:7px 12px;border-radius:999px;pointer-events:none';document.body.appendChild(b);}
   function loadAll(){
     if(live)return api(CONFIG.TABLE+'?select=name,relation,title,message,photo&order=created_at.asc&limit='+CONFIG.MAX).then(function(r){return r.json();});
